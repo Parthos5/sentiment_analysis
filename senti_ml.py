@@ -1,6 +1,7 @@
 import os
 import pandas as pd 
 import nltk
+import joblib
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -58,7 +59,7 @@ print("Testing set shape:", test_data.shape)
 tfidf_vectorizer = TfidfVectorizer()
 X_train_tfidf = tfidf_vectorizer.fit_transform(train_data['processed_review'])
 X_test_tfidf = tfidf_vectorizer.transform(test_data['processed_review'])
-
+joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
 print("Training set TF-IDF shape:", X_train_tfidf.shape)
 print("Testing set TF-IDF shape:", X_test_tfidf.shape)
 
@@ -82,3 +83,6 @@ print(classification_report(test_labels, predicted_labels))
 # Print confusion matrix
 print("Confusion Matrix:")
 print(confusion_matrix(test_labels, predicted_labels))
+
+# Save the trained model to a file
+joblib.dump(logreg_model, 'sentiment_analysis_model.pkl')
