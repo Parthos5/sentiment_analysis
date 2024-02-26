@@ -9,6 +9,8 @@ nltk.download('punkt')
 nltk.download('stopwords')
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score,classification_report,confusion_matrix
 
 def preprocess_text(text):
     # Tokenization
@@ -43,7 +45,7 @@ def load_dataset():
     return pd.DataFrame(data)
 
 dataset = load_dataset()
-dataset['processef_review'] = dataset['review'].apply(preprocess_text)
+dataset['processed_review'] = dataset['review'].apply(preprocess_text)
 print(dataset.head())
 
 # Split the dataset into training and testing sets
@@ -54,9 +56,29 @@ print("Training set shape:", train_data.shape)
 print("Testing set shape:", test_data.shape)
 
 tfidf_vectorizer = TfidfVectorizer()
-X_train_tfidf = tfidf_vectorizer.fit_transform(train_data['processed-review'])
-X_test_tfidf = tfidf_vectorizer.transform(test_data['processed-review'])
+X_train_tfidf = tfidf_vectorizer.fit_transform(train_data['processed_review'])
+X_test_tfidf = tfidf_vectorizer.transform(test_data['processed_review'])
 
 print("Training set TF-IDF shape:", X_train_tfidf.shape)
 print("Testing set TF-IDF shape:", X_test_tfidf.shape)
 
+# Define test_labels by extracting sentiment labels from test_data
+test_labels = test_data['sentiment']
+
+# applying logistic regression model
+logreg_model = LogisticRegression()
+
+logreg_model.fit(X_train_tfidf, train_data['sentiment'])
+predicted_labels = logreg_model.predict(X_test_tfidf)
+
+# Evaluate model performance
+accuracy = accuracy_score(test_labels, predicted_labels)
+print("Accuracy:", accuracy)
+
+# Print classification report
+print("Classification Report:")
+print(classification_report(test_labels, predicted_labels))
+
+# Print confusion matrix
+print("Confusion Matrix:")
+print(confusion_matrix(test_labels, predicted_labels))
